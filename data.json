@@ -15,5 +15,22 @@
     "updatedAt": 1783770384332,
     "createdAt": 1783770384332,
     "dokumen": []
+  },
+  {
+    "id": "ORD-1783770460912",
+    "kode": "BBK 02",
+    "noUrut": 2,
+    "jenis": "BUKTI BANK KELUAR",
+    "singkatan": "BBK",
+    "warnaJenis": "#ff8c00",
+    "tahun": 2026,
+    "nomorAwal": "15-024",
+    "nomorAkhir": "15-043",
+    "jumlah": 22,
+    "status": "Aktif",
+    "keterangan": "",
+    "updatedAt": 1783770460912,
+    "createdAt": 1783770460912,
+    "dokumen": []
   }
 ]
