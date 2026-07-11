@@ -18,6 +18,21 @@ function saveConfig(config) {
     StorageConfig.GITHUB_TOKEN = config.GITHUB_TOKEN;
 }
 
+// FUNGSI CEK TOKEN (VALIDASI KE GITHUB)
+async function verifyGitHubToken(token) {
+    try {
+        const response = await fetch('https://api.github.com/user', {
+            headers: {
+                'Authorization': `token ${token}`,
+                'Accept': 'application/vnd.github.v3+json'
+            }
+        });
+        return response.ok; // Akan mengembalikan true jika token benar, false jika salah/expired
+    } catch (e) {
+        return false;
+    }
+}
+
 // FUNGSI LOAD DATA (USER BIASA BISA BACA TANPA TOKEN)
 async function loadData() {
     const url = `https://api.github.com/repos/${StorageConfig.GITHUB_OWNER}/${StorageConfig.GITHUB_REPO}/contents/${StorageConfig.GITHUB_FILE_PATH}`;
@@ -28,7 +43,6 @@ async function loadData() {
     }
 
     try {
-        // Anti-cache agar selalu mendapat data terbaru
         const response = await fetch(url + '?t=' + new Date().getTime(), { 
             headers: headers,
             cache: 'no-store'
@@ -61,14 +75,13 @@ async function saveData(data) {
     const url = `https://api.github.com/repos/${StorageConfig.GITHUB_OWNER}/${StorageConfig.GITHUB_REPO}/contents/${StorageConfig.GITHUB_FILE_PATH}`;
     
     try {
-        // 1. Ambil token "SHA" terbaru DENGAN ANTI-CACHE
         let sha = '';
         const getRes = await fetch(url + '?t=' + new Date().getTime(), {
             headers: {
                 'Authorization': `token ${StorageConfig.GITHUB_TOKEN}`,
                 'Accept': 'application/vnd.github.v3+json'
             },
-            cache: 'no-store' // <--- Ini kunci agar tidak gagal di save kedua
+            cache: 'no-store'
         });
         
         if (getRes.ok) {
@@ -76,7 +89,6 @@ async function saveData(data) {
             sha = getJson.sha; 
         }
 
-        // 2. Encode JSON ke format Base64
         const contentStr = JSON.stringify(data, null, 2);
         const encodedContent = btoa(unescape(encodeURIComponent(contentStr)));
 
@@ -86,7 +98,6 @@ async function saveData(data) {
         };
         if (sha) bodyPayload.sha = sha; 
 
-        // 3. Timpa file di Github
         const putRes = await fetch(url, {
             method: 'PUT',
             headers: {
@@ -100,7 +111,6 @@ async function saveData(data) {
         if (putRes.ok) {
             console.log("Berhasil tersimpan otomatis ke GitHub!");
         } else {
-            // Tampilkan pesan error yang lebih spesifik jika tetap gagal
             const errData = await putRes.json();
             console.error("Github Error:", errData);
             alert(`Gagal menyimpan ke Cloud: ${errData.message}`);
