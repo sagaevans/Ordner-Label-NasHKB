@@ -18,16 +18,18 @@ function saveConfig(config) {
     StorageConfig.GITHUB_TOKEN = config.GITHUB_TOKEN;
 }
 
-// FUNGSI CEK TOKEN (VALIDASI KE GITHUB)
+// FUNGSI CEK TOKEN (VALIDASI KE GITHUB REPOSITORY)
 async function verifyGitHubToken(token) {
     try {
-        const response = await fetch('https://api.github.com/user', {
+        // Cek langsung ke repository-nya agar Fine-Grained Token (github_pat_...) tetap lolos
+        const url = `https://api.github.com/repos/${StorageConfig.GITHUB_OWNER}/${StorageConfig.GITHUB_REPO}`;
+        const response = await fetch(url, {
             headers: {
-                'Authorization': `token ${token}`,
+                'Authorization': `Bearer ${token}`, // Gunakan standar Bearer Token
                 'Accept': 'application/vnd.github.v3+json'
             }
         });
-        return response.ok; // Akan mengembalikan true jika token benar, false jika salah/expired
+        return response.ok; 
     } catch (e) {
         return false;
     }
@@ -39,7 +41,7 @@ async function loadData() {
     
     const headers = { 'Accept': 'application/vnd.github.v3+json' };
     if (StorageConfig.GITHUB_TOKEN) {
-        headers['Authorization'] = `token ${StorageConfig.GITHUB_TOKEN}`;
+        headers['Authorization'] = `Bearer ${StorageConfig.GITHUB_TOKEN}`;
     }
 
     try {
@@ -78,7 +80,7 @@ async function saveData(data) {
         let sha = '';
         const getRes = await fetch(url + '?t=' + new Date().getTime(), {
             headers: {
-                'Authorization': `token ${StorageConfig.GITHUB_TOKEN}`,
+                'Authorization': `Bearer ${StorageConfig.GITHUB_TOKEN}`,
                 'Accept': 'application/vnd.github.v3+json'
             },
             cache: 'no-store'
@@ -101,11 +103,10 @@ async function saveData(data) {
         const putRes = await fetch(url, {
             method: 'PUT',
             headers: {
-                'Authorization': `token ${StorageConfig.GITHUB_TOKEN}`,
+                'Authorization': `Bearer ${StorageConfig.GITHUB_TOKEN}`,
                 'Accept': 'application/vnd.github.v3+json',
                 'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(bodyPayload)
+            }
         });
 
         if (putRes.ok) {
