@@ -49,5 +49,22 @@
     "updatedAt": 1783770489508,
     "createdAt": 1783770489508,
     "dokumen": []
+  },
+  {
+    "id": "ORD-1783770522660",
+    "kode": "BBK 04",
+    "noUrut": 4,
+    "jenis": "BUKTI BANK KELUAR",
+    "singkatan": "BBK",
+    "warnaJenis": "#ff8c00",
+    "tahun": 2026,
+    "nomorAwal": "15-062",
+    "nomorAkhir": "15-080",
+    "jumlah": 19,
+    "status": "Aktif",
+    "keterangan": "",
+    "updatedAt": 1783770522660,
+    "createdAt": 1783770522660,
+    "dokumen": []
   }
 ]
