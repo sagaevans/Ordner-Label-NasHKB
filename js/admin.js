@@ -1,5 +1,6 @@
 /* =========================================================
    ADMIN PANEL LOGIC (admin.js)
+   Menggunakan Modal Bawaan & Mengunci Konfigurasi (Hardcode)
 ========================================================= */
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -31,10 +32,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     const formKeterangan = document.getElementById('formKeterangan');
     const formWarnaJenis = document.getElementById('warnaJenis'); 
 
-    // --- Referensi Elemen DOM: Modal Settings (Lama) ---
+    // --- Referensi Elemen DOM: Modal Settings (Bawaan Anda) ---
     const modalSettings = document.getElementById('modalSettings');
     const closeSettingsBtn = document.getElementById('closeSettingsBtn');
     const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+    
+    const configMode = document.getElementById('configMode');
+    const configToken = document.getElementById('configToken');
+    const configOwner = document.getElementById('configOwner');
+    const configRepo = document.getElementById('configRepo');
     
     // --- Referensi Elemen DOM: Tools ---
     const btnExport = document.getElementById('btnExport');
@@ -44,39 +50,85 @@ document.addEventListener('DOMContentLoaded', async () => {
     let ordnerData = [];
 
     /* =========================================================
-       INISIALISASI & KOTAK DIALOG LOGIN (PROMPT)
+       INISIALISASI & MODAL PENGATURAN OTOMATIS
     ========================================================= */
     
     async function init() {
-        // Jika Token belum tersimpan di browser perangkat ini
-        if (!StorageConfig.GITHUB_TOKEN) {
-            const tokenInput = prompt(
-                "MASUK ADMIN PANEL\n\n" +
-                "Repository: sagaevans/Ordner-Label-NasHKB\n\n" +
-                "Silakan masukkan GitHub Personal Access Token Anda:"
-            );
+        // 1. Kunci dan isi otomatis (Hardcode) elemen input di UI Pengaturan
+        if (configMode) {
+            configMode.value = 'GITHUB';
+            configMode.disabled = true; // Kunci Dropdown
+            configMode.style.backgroundColor = '#f1f5f9';
+            configMode.style.cursor = 'not-allowed';
+        }
+        if (configOwner) {
+            configOwner.value = 'sagaevans';
+            configOwner.readOnly = true; // Kunci Input
+            configOwner.style.backgroundColor = '#f1f5f9';
+            configOwner.style.color = '#64748b';
+            configOwner.style.cursor = 'not-allowed';
+        }
+        if (configRepo) {
+            configRepo.value = 'Ordner-Label-NasHKB';
+            configRepo.readOnly = true; // Kunci Input
+            configRepo.style.backgroundColor = '#f1f5f9';
+            configRepo.style.color = '#64748b';
+            configRepo.style.cursor = 'not-allowed';
+        }
+        
+        // Tampilkan token lama jika sudah ada
+        if (configToken && StorageConfig.GITHUB_TOKEN) {
+            configToken.value = StorageConfig.GITHUB_TOKEN;
+        }
 
-            // Jika admin mengisi token dan klik OK
-            if (tokenInput && tokenInput.trim() !== "") {
-                const newConfig = {
-                    GITHUB_TOKEN: tokenInput.trim()
-                };
-                saveConfig(newConfig); 
-                
-                // Mulai muat data
-                ordnerData = await loadData();
-                renderTable(ordnerData);
-            } else {
-                // Jika kosong/cancel
-                alert("Akses Ditolak: Token wajib diisi untuk mengelola data.");
-                tableBody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:red; font-weight:bold;">Akses ditolak. Silakan refresh halaman dan masukkan token API Anda.</td></tr>';
-            }
+        // 2. Jika Token belum tersimpan, langsung paksa buka Modal Pengaturan
+        if (!StorageConfig.GITHUB_TOKEN) {
+            openModal(modalSettings);
         } else {
-            // Jika Token sudah ada, langsung muat tabel
+            // Jika token sudah ada, langsung muat data
             ordnerData = await loadData();
             renderTable(ordnerData);
         }
     }
+
+    // --- LOGIKA TOMBOL "TERAPKAN PENGATURAN" ---
+    if (saveSettingsBtn) {
+        saveSettingsBtn.addEventListener('click', async () => {
+            const tokenVal = configToken ? configToken.value.trim() : '';
+            
+            if (!tokenVal) {
+                alert("Token API GitHub wajib diisi untuk mengelola data!");
+                return; // Jangan tutup modal jika kosong
+            }
+
+            // Simpan HANYA Token ke storage
+            const newConfig = {
+                GITHUB_TOKEN: tokenVal
+            };
+            saveConfig(newConfig); 
+            
+            closeModal(modalSettings);
+            
+            // Muat ulang data setelah token tersimpan
+            ordnerData = await loadData();
+            renderTable(ordnerData);
+        });
+    }
+
+    // Pencegahan agar admin tidak asal tutup form jika token kosong
+    if (closeSettingsBtn) {
+        closeSettingsBtn.addEventListener('click', () => {
+            if (!StorageConfig.GITHUB_TOKEN) {
+                alert("Anda tidak bisa menutup panel ini sebelum memasukkan Token API.");
+            } else {
+                closeModal(modalSettings);
+            }
+        });
+    }
+
+    /* =========================================================
+       RENDER TABEL
+    ========================================================= */
 
     function renderTable(data) {
         tableBody.innerHTML = '';
@@ -117,11 +169,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     ========================================================= */
     
     function openModal(modalEl) {
-        modalEl.classList.add('active');
+        if(modalEl) modalEl.classList.add('active');
     }
 
     function closeModal(modalEl) {
-        modalEl.classList.remove('active');
+        if(modalEl) modalEl.classList.remove('active');
     }
 
     /* =========================================================
@@ -142,7 +194,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        // Tampilkan teks feedback
         const originalText = saveFormBtn.textContent;
         saveFormBtn.textContent = "Menyimpan ke GitHub...";
         saveFormBtn.disabled = true;
@@ -177,12 +228,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             ordnerData.push(newData);
         }
 
-        // Simpan otomatis menimpa ke GitHub API (karena storage.js sdh diedit)
         await saveData(ordnerData);
         ordnerData = await loadData(); 
         renderTable(ordnerData);
         
-        // Kembalikan tombol
         saveFormBtn.textContent = originalText;
         saveFormBtn.disabled = false;
         closeModal(modalForm);
@@ -223,7 +272,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     const itemIndex = ordnerData.findIndex(item => item.id === id);
                     if (itemIndex > -1) {
                         ordnerData.splice(itemIndex, 1);
-                        await saveData(ordnerData); // Save perubahan hapus ke github
+                        await saveData(ordnerData); 
                         ordnerData = await loadData();
                         renderTable(ordnerData);
                     }
@@ -255,17 +304,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (btnSettings) {
         btnSettings.addEventListener('click', () => {
-            // Sembunyikan field repo (karena sudah di-hardcode)
-            const configArea = document.getElementById('githubSettings');
-            const modeSelect = document.getElementById('configMode');
-            if(configArea) configArea.style.display = 'none';
-            if(modeSelect && modeSelect.parentElement) modeSelect.parentElement.style.display = 'none';
             openModal(modalSettings);
         });
     }
-
-    if (closeSettingsBtn) closeSettingsBtn.addEventListener('click', () => closeModal(modalSettings));
-    if (saveSettingsBtn) saveSettingsBtn.addEventListener('click', () => closeModal(modalSettings));
 
     if (btnExport) {
         btnExport.addEventListener('click', () => {
