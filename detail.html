@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detail Ordner - Daftar Ordner Akuntansi</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* CSS tambahan khusus untuk layout halaman detail */
+        .detail-card {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            border-top: 4px solid var(--navy-primary);
+            margin-bottom: 2rem;
+        }
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+        .detail-item p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 0.2rem;
+        }
+        .detail-item h4 {
+            font-size: 1.1rem;
+            color: var(--navy-primary);
+            font-weight: 600;
+        }
+        .section-title {
+            margin-bottom: 1rem;
+            color: var(--navy-primary);
+            font-size: 1.25rem;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    
+    <nav class="navbar">
+        <div class="container">
+            <div class="brand">
+                <img src="pic/logo.png" alt="Logo" onerror="this.style.display='none'">
+                Ordner Akuntansi
+            </div>
+            <div class="nav-links">
+                <a href="index.html">Dashboard</a>
+                <a href="admin.html">Admin Panel</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        
+        <div id="errorContainer" style="display: none; text-align: center; padding: 3rem 0;">
+            <h2 style="color: var(--danger); margin-bottom: 1rem;">Data Ordner Tidak Ditemukan!</h2>
+            <a href="index.html" class="btn btn-primary">Kembali ke Dashboard</a>
+        </div>
+
+        <div id="detailContainer" style="display: none;">
+            <header class="page-header">
+                <div>
+                    <h1 class="page-title" id="detailKode">Memuat Data...</h1>
+                    <span id="detailStatus" style="margin-top: 5px; display: inline-block;"></span>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button id="btnPrint" class="btn btn-gold">🖨️ Print Cover Ordner</button>
+                    <a href="index.html" class="btn btn-outline">Kembali</a>
+                </div>
+            </header>
+
+            <section class="detail-card">
+                <h3 class="section-title">Informasi Umum</h3>
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <p>Jenis Dokumen</p>
+                        <h4 id="detailJenis">-</h4>
+                    </div>
+                    <div class="detail-item">
+                        <p>Singkatan</p>
+                        <h4 id="detailSingkatan">-</h4>
+                    </div>
+                    <div class="detail-item">
+                        <p>Tahun</p>
+                        <h4 id="detailTahun">-</h4>
+                    </div>
+                    <div class="detail-item">
+                        <p>Rentang Nomor Dokumen</p>
+                        <h4><span id="detailNoAwal">-</span> s/d <span id="detailNoAkhir">-</span></h4>
+                    </div>
+                    <div class="detail-item">
+                        <p>Total Jumlah Dokumen</p>
+                        <h4 id="detailJumlah">-</h4>
+                    </div>
+                    <div class="detail-item">
+                        <p>Keterangan Tambahan</p>
+                        <h4 id="detailKeterangan">-</h4>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <h3 class="section-title">Daftar Dokumen dalam Ordner</h3>
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 50px;">No</th>
+                                <th>Nomor Dokumen</th>
+                                <th>Tanggal</th>
+                                <th>Uraian / Keterangan</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableDokumen">
+                            </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+    </main>
+
+    <script src="js/storage.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/detail.js"></script>
+</body>
+</html>

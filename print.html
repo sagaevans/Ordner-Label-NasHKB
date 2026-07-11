@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Print Label Ordner (Presisi 90% - Center)</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* =========================================================
+           SISTEM MULTI-PRINT (A4 LANDSCAPE - FIT TO PRINTER)
+        ========================================================= */
+        
+        .print-page-wrapper {
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: var(--bg-light);
+            min-height: 100vh;
+        }
+
+        .control-panel {
+            background: var(--white);
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            width: 100%;
+            max-width: 600px;
+            margin-bottom: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .control-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 1rem;
+        }
+
+        /* Container Print (Simulasi Kertas A4 Landscape) */
+        .print-grid {
+            display: flex;
+            gap: 2mm; 
+            justify-content: center;
+            align-items: flex-start;
+            flex-wrap: nowrap;
+            background-color: var(--white);
+            padding: 5mm; 
+            box-shadow: var(--shadow-md);
+            width: 297mm; 
+            min-height: 210mm; 
+            box-sizing: border-box;
+        }
+
+        /* Wrapper Utama Label */
+        .label-wrapper {
+            width: var(--label-width);
+            height: var(--label-height);
+            margin-top: var(--label-mt);
+            margin-left: var(--label-ml);
+            border: 2px solid #000; 
+            background-color: #ffffff;
+            container-type: size;
+            box-sizing: border-box;
+            padding: 1.5mm; 
+        }
+
+        /* Outline Dalam (Garis ganda) */
+        .label-outline-inner {
+            border: 1px solid #000;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            font-family: 'Arial Black', Impact, Arial, sans-serif;
+            color: #000;
+            box-sizing: border-box;
+        }
+
+        /* =========================================================
+           BAGIAN 1: HEADER (LOGO DI KERTAS LABEL)
+        ========================================================= */
+        .label-header {
+            width: 100%;
+            height: 16%; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1cqw;
+            border-bottom: 4px solid #000; 
+            box-sizing: border-box;
+        }
+
+        .label-logo {
+            width: 100%;
+            max-height: 100%;
+            object-fit: contain; 
+        }
+
+        /* =========================================================
+           BAGIAN 2: BODY (NO URUT, JENIS, TAHUN)
+        ========================================================= */
+        .label-body {
+            flex-grow: 1; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            text-align: center;
+            padding: 1.5cqh 0;
+            gap: 1cqh;
+            box-sizing: border-box;
+        }
+
+        .label-no-urut {
+            font-size: 38cqw; 
+            font-weight: 900;
+            line-height: 0.8;
+            color: #556B2F; 
+            -webkit-text-stroke: 1px #000; 
+            text-shadow: 2px 2px 0 #000;
+            margin-bottom: 1cqh;
+        }
+
+        .label-jenis, .label-singkatan {
+            font-size: 16cqw;
+            font-weight: 900;
+            line-height: 1.1;
+            color: #FF8C00; 
+            -webkit-text-stroke: 0.5px #000;
+        }
+
+        .label-tahun {
+            font-size: 20cqw;
+            font-weight: 900;
+            color: #87CEEB; 
+            -webkit-text-stroke: 1px #000;
+            margin-top: auto; 
+        }
+
+        /* =========================================================
+           BAGIAN 3: FOOTER (NO DOKUMEN)
+        ========================================================= */
+        .label-footer {
+            width: 100%;
+            height: 27%; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            border-top: 4px solid #000; 
+            padding: 0 1mm; 
+            font-family: Arial, Helvetica, sans-serif; 
+            box-sizing: border-box;
+            overflow: hidden; 
+        }
+
+        .no-doc-title {
+            font-size: 7.5cqw; 
+            font-weight: 900;
+            margin-bottom: 0.2cqh;
+        }
+
+        .no-doc-value {
+            font-size: 17cqw; 
+            font-weight: 900;
+            text-decoration: none; 
+            line-height: 1; 
+            white-space: nowrap; 
+            max-width: 100%; 
+            letter-spacing: -0.5px; 
+        }
+
+        .no-doc-divider {
+            font-size: 5.5cqw; 
+            font-weight: bold;
+            font-style: italic;
+            margin: 0.2cqh 0;
+        }
+
+        .editable { width: 100%; outline: none; }
+        .editable[contenteditable="true"]:hover,
+        .editable[contenteditable="true"]:focus {
+            background-color: rgba(212, 175, 55, 0.2);
+        }
+
+        /* =========================================================
+           MODE PRINT KHUSUS (TENGAN PRESISI & ANTI BOCOR HALAMAN 2)
+        ========================================================= */
+        @media print {
+            @page {
+                size: A4 landscape;
+                margin: 0 !important; 
+            }
+            body, html { 
+                margin: 0 !important; 
+                padding: 0 !important; 
+                width: 100vw !important; 
+                height: 100vh !important; 
+                overflow: hidden !important; 
+                background-color: #ffffff; 
+            }
+            .navbar, .no-print { display: none !important; }
+            
+            .print-page-wrapper { 
+                padding: 0 !important; 
+                margin: 0 !important;
+                width: 100vw !important;
+                height: 100vh !important;
+                display: flex !important;
+                justify-content: center !important; 
+                align-items: center !important; 
+                background: none; 
+                overflow: hidden !important;
+            }
+            
+            .print-grid {
+                padding: 0 !important;
+                margin: 0 auto !important; 
+                box-shadow: none;
+                width: max-content !important;
+                height: max-content !important;
+                display: flex !important;
+                justify-content: center !important; 
+                align-items: center !important;
+            }
+            
+            .label-wrapper {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                page-break-inside: avoid; 
+            }
+        }
+    </style>
+</head>
+<body>
+    
+    <!-- Navbar (Logo sudah dihapus) -->
+    <nav class="navbar no-print">
+        <div class="container">
+            <div class="brand">
+                Ordner Akuntansi
+            </div>
+            <div class="nav-links">
+                <a href="index.html">Kembali ke Dashboard</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="print-page-wrapper">
+        <div class="control-panel no-print">
+            <h2 style="font-size: 1.2rem; color: var(--navy-primary);">Pengaturan Print Label (Otomatis 90%)</h2>
+            <div class="control-row">
+                <div class="form-group" style="margin: 0; flex-grow: 1;">
+                    <label for="templateSelect">Mode Cetak:</label>
+                    <select id="templateSelect" class="form-control">
+                        <!-- Diisi dinamis -->
+                    </select>
+                </div>
+                <button id="btnExecutePrint" class="btn btn-gold" style="height: 42px;">🖨️ Cetak Sekarang</button>
+            </div>
+            <p style="font-size: 0.85rem; color: var(--danger); margin-top: 10px; font-weight: 500;">
+                *PENTING: Di jendela Print, cukup atur Layout ke <strong>Landscape</strong>. Scale biarkan <strong>Default</strong>, dan Margins: <strong>Default/None</strong>. Sistem sudah menyesuaikan ukurannya secara otomatis.
+            </p>
+        </div>
+
+        <!-- LOGO DUAL DI HALAMAN WEB (Mengisi Ruang Kosong) -->
+        <div class="no-print" style="display: flex; justify-content: center; align-items: center; gap: 50px; margin-bottom: 2rem; width: 100%;">
+            <img src="https://bhirawasteel.com/wp-content/uploads/2023/01/cropped-Logo-HK-Bhirawa-300x85-1.png" alt="HK Bhirawa" style="height: 50px; object-fit: contain;">
+            <img src="pic/33047458-fotor-20260711105326.png" alt="Logo NAS" style="height: 50px; object-fit: contain;">
+        </div>
+
+        <div class="print-area">
+            <div class="print-grid" id="printGrid">
+                <!-- Label render -->
+            </div>
+        </div>
+    </div>
+
+    <!-- TEMPLATE LABEL DIKEMBALIKAN KE VERSI NORMAL -->
+    <template id="labelTemplate">
+        <div class="label-wrapper">
+            <div class="label-outline-inner">
+                <div class="label-header">
+                    <img src="https://bhirawasteel.com/wp-content/uploads/2023/01/cropped-Logo-HK-Bhirawa-300x85-1.png" alt="PT Bhirawa Steel" class="label-logo">
+                </div>
+                
+                <div class="label-body">
+                    <div class="editable label-no-urut" contenteditable="true">1</div>
+                    <div class="editable label-jenis" contenteditable="true">BUKTI BANK KELUAR</div>
+                    <div class="editable label-singkatan" contenteditable="true">(BBK)</div>
+                    <div class="editable label-tahun" contenteditable="true">2013</div>
+                </div>
+                
+                <div class="label-footer">
+                    <div class="no-doc-title">No. Dokumen :</div>
+                    <div class="editable label-no-awal no-doc-value" contenteditable="true">15...0000</div>
+                    <div class="no-doc-divider">sampai dengan</div>
+                    <div class="editable label-no-akhir no-doc-value" contenteditable="true">15...0036</div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <script src="js/storage.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/print.js"></script>
+</body>
+</html>

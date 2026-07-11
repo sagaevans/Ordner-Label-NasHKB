@@ -1,0 +1,519 @@
+/* =========================================================
+   1. GOOGLE FONTS & VARIABLES
+========================================================= */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+    /* Color Palette */
+    --navy-primary: #183669;
+    --navy-secondary: #4a4a96;
+    --navy-deep: #0F2148;
+    --gold-primary: #D4AF37;
+    --gold-hover: #C5A030;
+    --gold-light: #F3E5AB;
+    --white: #FFFFFF;
+    --bg-light: #F4F6FB;
+    --text-dark: #1A202C;
+    --text-muted: #64748B;
+    --border-color: #E2E8F0;
+
+    /* Status Colors */
+    --danger: #EF4444;
+    --danger-hover: #DC2626;
+    --success: #10B981;
+    --info: #3B82F6;
+
+    /* Shadow & Border Radius */
+    --shadow-sm: 0 1px 3px 0 rgba(24, 54, 105, 0.08);
+    --shadow-md: 0 8px 20px -4px rgba(24, 54, 105, 0.18);
+    --shadow-lg: 0 20px 40px -8px rgba(24, 54, 105, 0.25);
+    --radius: 12px;
+}
+
+/* =========================================================
+   2. GLOBAL RESET & TYPOGRAPHY
+========================================================= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #EEF1F8;
+    background-image:
+        radial-gradient(circle at 10% 0%, rgba(24, 54, 105, 0.14) 0%, transparent 40%),
+        radial-gradient(circle at 90% 10%, rgba(212, 175, 55, 0.16) 0%, transparent 45%),
+        radial-gradient(circle at 50% 100%, rgba(74, 74, 150, 0.10) 0%, transparent 50%),
+        linear-gradient(160deg, #EEF1F8 0%, #E4E9F5 40%, #EFEAF4 75%, #F6F1E6 100%);
+    background-attachment: fixed;
+    color: var(--text-dark);
+    line-height: 1.6;
+    font-size: 14px;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+ul {
+    list-style: none;
+}
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* =========================================================
+   3. NAVBAR & HEADER
+========================================================= */
+.navbar {
+    background: linear-gradient(120deg, var(--navy-deep) 0%, var(--navy-primary) 55%, var(--navy-secondary) 100%);
+    color: var(--white);
+    padding: 1.1rem 0;
+    box-shadow: var(--shadow-md);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 3px solid var(--gold-primary);
+}
+
+.navbar .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    color: var(--gold-primary);
+    text-shadow: 0 1px 8px rgba(212, 175, 55, 0.25);
+}
+
+.brand img {
+    height: 40px;
+}
+
+.nav-links {
+    display: flex;
+    gap: 8px;
+}
+
+.nav-links a {
+    color: rgba(255, 255, 255, 0.85);
+    font-weight: 500;
+    transition: all 0.25s ease;
+    padding: 8px 16px;
+    border-radius: 999px;
+}
+
+.nav-links a:hover {
+    color: var(--white);
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+.nav-links a.active {
+    color: var(--navy-deep);
+    background-color: var(--gold-primary);
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.35);
+}
+
+/* =========================================================
+   4. LAYOUT & MAIN CONTENT
+========================================================= */
+main {
+    padding: 2.5rem 0;
+    min-height: calc(100vh - 75px);
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.page-title {
+    color: var(--navy-primary);
+    font-size: 1.6rem;
+    font-weight: 700;
+    position: relative;
+    padding-left: 16px;
+}
+
+.page-title::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 4px;
+    bottom: 4px;
+    width: 5px;
+    border-radius: 4px;
+    background: linear-gradient(180deg, var(--gold-primary), var(--navy-primary));
+}
+
+/* =========================================================
+   5. COMPONENTS (BUTTONS, INPUTS, BADGES)
+========================================================= */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 0.65rem 1.3rem;
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.25s ease;
+    letter-spacing: 0.2px;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--navy-primary), var(--navy-secondary));
+    color: var(--white);
+    box-shadow: 0 4px 12px rgba(24, 54, 105, 0.25);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px rgba(24, 54, 105, 0.32);
+}
+
+.btn-gold {
+    background: linear-gradient(135deg, var(--gold-primary), var(--gold-hover));
+    color: var(--navy-deep);
+    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.35);
+}
+
+.btn-gold:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px rgba(212, 175, 55, 0.45);
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, var(--danger), var(--danger-hover));
+    color: var(--white);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.btn-danger:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px rgba(239, 68, 68, 0.4);
+}
+
+.btn-outline {
+    background-color: var(--white);
+    border: 1.5px solid var(--navy-primary);
+    color: var(--navy-primary);
+}
+
+.btn-outline:hover {
+    background-color: var(--navy-primary);
+    color: var(--white);
+    transform: translateY(-2px);
+}
+
+.form-group {
+    margin-bottom: 1.2rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--navy-secondary);
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.65rem 1rem;
+    border: 1.5px solid var(--border-color);
+    border-radius: var(--radius);
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.9rem;
+    background-color: var(--white);
+    transition: all 0.25s ease;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--gold-primary);
+    box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.15);
+}
+
+.search-bar {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    max-width: 400px;
+}
+
+.badge {
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+}
+
+.badge-active { background-color: #D1FAE5; color: #059669; }
+.badge-inactive { background-color: #FEE2E2; color: var(--danger); }
+
+/* =========================================================
+   6. CARDS (ORDNER LIST)
+========================================================= */
+.dashboard-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: linear-gradient(150deg, var(--white) 60%, #FCFAF2 100%);
+    padding: 1.6rem;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    border-left: 5px solid var(--gold-primary);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+}
+
+.stat-title {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.stat-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--navy-primary);
+}
+
+.ordner-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+.ordner-card {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 1.6rem;
+    box-shadow: var(--shadow-sm);
+    border-top: 4px solid var(--navy-primary);
+    background-image: linear-gradient(180deg, rgba(24,54,105,0.03) 0%, transparent 10%);
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.ordner-card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-lg);
+    border-top-color: var(--gold-primary);
+}
+
+.ordner-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.ordner-code {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--navy-primary);
+    letter-spacing: 0.3px;
+}
+
+.ordner-details {
+    flex-grow: 1;
+    margin-bottom: 1.5rem;
+}
+
+.ordner-details p {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 0.4rem;
+}
+
+.ordner-details span {
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+/* =========================================================
+   7. TABLES & MODALS
+========================================================= */
+.table-responsive {
+    overflow-x: auto;
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-color);
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 800px;
+}
+
+.data-table th, .data-table td {
+    padding: 14px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.data-table tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.data-table tbody tr:hover {
+    background-color: #F7F9FC;
+}
+
+.data-table th {
+    background: linear-gradient(120deg, var(--navy-deep), var(--navy-primary));
+    color: var(--white);
+    font-weight: 600;
+    font-size: 0.85rem;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-color: rgba(15, 23, 42, 0.65);
+    backdrop-filter: blur(3px);
+    z-index: 1000;
+    align-items: center; justify-content: center;
+    opacity: 0; transition: opacity 0.3s ease;
+}
+.modal.active { display: flex; opacity: 1; }
+.modal-content {
+    background-color: var(--white);
+    width: 100%; max-width: 600px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lg);
+    max-height: 90vh; display: flex; flex-direction: column;
+    border-top: 4px solid var(--gold-primary);
+}
+.modal-header { padding: 1.5rem; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; }
+.modal-title { font-size: 1.2rem; font-weight: 700; color: var(--navy-primary); }
+.close-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted); transition: color 0.2s; }
+.close-btn:hover { color: var(--danger); }
+.modal-body { padding: 1.5rem; overflow-y: auto; }
+.modal-footer { padding: 1.5rem; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end; gap: 10px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+/* =========================================================
+   8. PRINT MEDIA QUERIES (GLOBAL)
+========================================================= */
+.print-area { display: none; }
+@media print {
+    @page { size: A4 portrait; margin: 0; }
+    body { background-color: var(--white); background-image: none; }
+    .navbar, .no-print, .btn, .page-header { display: none !important; }
+    .print-area { display: block; width: 100%; height: 100vh; }
+}
+
+@media (max-width: 768px) {
+    .form-row { grid-template-columns: 1fr; }
+    .page-header { flex-direction: column; align-items: flex-start; }
+    .nav-links { display: none; }
+}
+
+/* =========================================================
+   9. BULK ACTION MODE (DASHBOARD)
+========================================================= */
+.card-checkbox-wrapper {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px dashed var(--border-color);
+}
+
+.card-checkbox-wrapper input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: var(--gold-primary);
+}
+
+.card-checkbox-wrapper label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--navy-primary);
+    cursor: pointer;
+}
+
+.ordner-grid.select-mode .card-checkbox-wrapper {
+    display: flex;
+}
+
+.ordner-grid.select-mode .ordner-card {
+    cursor: pointer;
+}
+
+.ordner-card.selected {
+    border-color: var(--gold-primary);
+    background-color: #FEFCF6;
+    box-shadow: var(--shadow-md);
+}
+
+.bulk-action-panel {
+    position: fixed;
+    bottom: -100px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(120deg, var(--navy-deep), var(--navy-primary));
+    color: var(--white);
+    padding: 1rem 2rem;
+    border-radius: 50px;
+    box-shadow: 0 10px 30px rgba(15, 33, 72, 0.4);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    z-index: 1000;
+    transition: bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+}
+
+.bulk-action-panel.show {
+    bottom: 30px;
+}
+
+.bulk-action-panel .selection-info {
+    font-weight: 500;
+    font-size: 1rem;
+}

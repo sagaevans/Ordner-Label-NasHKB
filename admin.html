@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Daftar Ordner Akuntansi</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    
+    <nav class="navbar">
+        <div class="container">
+            <div class="brand">
+                <img src="pic/logo.png" alt="Logo" onerror="this.style.display='none'">
+                Ordner Akuntansi By NasZ
+            </div>
+            <div class="nav-links">
+                <a href="index.html">Dashboard</a>
+                <a href="admin.html" class="active">Admin Panel</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        
+        <header class="page-header">
+            <h1 class="page-title">Manajemen Data Ordner</h1>
+            
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <input type="text" id="searchAdmin" class="form-control" placeholder="Cari data..." style="width: 250px;">
+                <button id="btnTambah" class="btn btn-primary">Tambah Ordner</button>
+                <button id="btnSettings" class="btn btn-outline">Pengaturan Sistem</button>
+            </div>
+        </header>
+
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Kode</th>
+                        <th>No. Urut</th>
+                        <th>Jenis Dokumen</th>
+                        <th>Tahun</th>
+                        <th>No. Dokumen</th>
+                        <th>Jumlah</th>
+                        <th>Status</th>
+                        <th style="text-align: center;">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    </tbody>
+            </table>
+        </div>
+    </main>
+
+    <div class="modal" id="modalForm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Tambah Ordner Baru</h2>
+                <button class="close-btn" id="closeFormBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="ordnerForm">
+                    <input type="hidden" id="formId">
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="formKode">Kode Ordner</label>
+                            <input type="text" id="formKode" class="form-control" placeholder="Misal: BKK-2026-01" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="formNoUrut">Nomor Urut / Volume</label>
+                            <input type="number" id="formNoUrut" class="form-control" placeholder="Misal: 1" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="formTahun">Tahun</label>
+                            <input type="number" id="formTahun" class="form-control" placeholder="Misal: 2026" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="formJenis">Jenis Dokumen</label>
+                            <input type="text" id="formJenis" class="form-control" placeholder="Misal: Bukti Kas Keluar" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="formSingkatan">Singkatan</label>
+                            <input type="text" id="formSingkatan" class="form-control" placeholder="Misal: BKK" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="formNoAwal">Nomor Dokumen Awal</label>
+                            <input type="text" id="formNoAwal" class="form-control" placeholder="Misal: 15...0000" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="formNoAkhir">Nomor Dokumen Akhir</label>
+                            <input type="text" id="formNoAkhir" class="form-control" placeholder="Misal: 15...0036" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="formJumlah">Jumlah Dokumen</label>
+                            <input type="number" id="formJumlah" class="form-control" placeholder="Otomatis / Manual" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group" style="grid-column: span 2;">
+                            <label for="formStatus">Status</label>
+                            <select id="formStatus" class="form-control" required>
+                                <option value="Aktif">Aktif</option>
+                                <option value="Inaktif">Inaktif</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+    <label for="warnaJenis">Warna Label (Jenis & Singkatan)</label>
+    <input type="color" id="warnaJenis" class="form-control" value="#FF8C00" style="height: 42px; padding: 2px; cursor: pointer; width: 100%;">
+</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="formKeterangan">Keterangan Tambahan</label>
+                        <input type="text" id="formKeterangan" class="form-control" placeholder="Informasi tambahan (opsional)">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="cancelFormBtn">Batal</button>
+                <button class="btn btn-primary" id="saveFormBtn">Simpan Data</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="modalSettings">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Pengaturan & Backup System</h2>
+                <button class="close-btn" id="closeSettingsBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                
+                <h3 style="margin-bottom: 15px; color: var(--navy-primary); border-bottom: 1px solid var(--border-color); padding-bottom: 5px;">Konfigurasi Penyimpanan</h3>
+                <div class="form-group">
+                    <label for="configMode">Mode Database</label>
+                    <select id="configMode" class="form-control">
+                        <option value="OFFLINE">Mode Offline (Lokal JSON)</option>
+                        <option value="GITHUB">Mode GitHub (Online API)</option>
+                    </select>
+                </div>
+                
+                <div id="githubSettings" style="background: var(--bg-light); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                    <p style="font-size: 0.85rem; color: var(--danger); margin-bottom: 10px;">*Isi data berikut HANYA jika menggunakan Mode GitHub</p>
+                    <div class="form-group">
+                        <label>GitHub Personal Access Token</label>
+                        <input type="password" id="configToken" class="form-control" placeholder="ghp_xxxxxxxxxxxxxxxxx">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Repository Owner</label>
+                            <input type="text" id="configOwner" class="form-control" placeholder="username github">
+                        </div>
+                        <div class="form-group">
+                            <label>Repository Name</label>
+                            <input type="text" id="configRepo" class="form-control" placeholder="nama-repo">
+                        </div>
+                    </div>
+                </div>
+
+                <h3 style="margin-bottom: 15px; color: var(--navy-primary); border-bottom: 1px solid var(--border-color); padding-bottom: 5px;">Manajemen File</h3>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button id="btnExport" class="btn btn-primary">Export JSON (Backup)</button>
+                    <label for="importFile" class="btn btn-gold" style="margin: 0; cursor: pointer;">Import JSON (Restore)</label>
+                    <input type="file" id="importFile" accept=".json" style="display: none;">
+                    
+                    <button id="btnReset" class="btn btn-danger">Reset Dummy Data</button>
+                </div>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 10px;">Import dan Reset akan menimpa seluruh data yang ada saat ini.</p>
+
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" id="saveSettingsBtn">Terapkan Pengaturan</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/storage.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+</html>

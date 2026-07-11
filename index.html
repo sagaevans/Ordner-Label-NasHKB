@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Daftar Ordner Akuntansi</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="brand">
+                Ordner Akuntansi By Nasz
+            </div>
+            <div class="nav-links">
+                <a href="index.html" class="active">Dashboard</a>
+                <a href="admin.html">Admin Panel</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Konten Utama -->
+    <main class="container">
+        <header class="page-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+            
+            <!-- Posisi Logo Baru Menggantikan Teks Dashboard -->
+            <img src="https://bhirawasteel.com/wp-content/uploads/2023/01/cropped-Logo-HK-Bhirawa-300x85-1.png" alt="Logo HK Bhirawa" style="height: 50px;">
+            
+            <div class="header-actions" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <input type="text" id="searchInput" class="form-control search-input" placeholder="Cari Kode, Jenis, atau Tahun..." style="width: 250px;">
+                <button id="btnBulkSelect" class="btn btn-outline">☑ Pilih untuk Print</button>
+            </div>
+        </header>
+
+        <!-- Statistik -->
+        <div class="stats-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px;">
+            <div class="stat-card" style="background: var(--white); padding: 20px; border-radius: 8px; box-shadow: var(--shadow-sm); border-left: 4px solid var(--gold-secondary);">
+                <h3 style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 10px;">Total Ordner</h3>
+                <p class="stat-number" id="totalOrdner" style="font-size: 2rem; font-weight: bold; color: var(--navy-primary);">0</p>
+            </div>
+            <div class="stat-card" style="background: var(--white); padding: 20px; border-radius: 8px; box-shadow: var(--shadow-sm); border-left: 4px solid var(--gold-secondary);">
+                <h3 style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 10px;">Total Dokumen</h3>
+                <p class="stat-number" id="totalDokumen" style="font-size: 2rem; font-weight: bold; color: var(--navy-primary);">0</p>
+            </div>
+        </div>
+
+        <!-- Daftar Ordner (Grid) -->
+        <div id="ordnerList" class="ordner-grid">
+            <!-- Data akan dirender di sini oleh JavaScript -->
+        </div>
+    </main>
+
+    <!-- Panel Aksi Bulk (Melayang di bawah) -->
+    <div class="bulk-action-panel" id="bulkActionPanel">
+        <div class="bulk-action-content">
+            <span style="font-weight: 600; color: white;"><span id="selectedCount">0</span>/4 Ordner Terpilih</span>
+            <div style="display: flex; gap: 10px;">
+                <button id="btnExecuteBulkPrint" class="btn btn-gold">🖨️ Print Label</button>
+                <button id="btnCancelBulkSelect" class="btn btn-danger">Batal</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script -->
+    <script src="js/storage.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/index.js"></script>
+</body>
+</html>
