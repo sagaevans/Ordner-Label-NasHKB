@@ -5,7 +5,7 @@
 
 // Konfigurasi Hardcode (Username & Repo Anda terkunci di sini)
 const StorageConfig = {
-    MODE: 'GITHUB', // Paksa mode GITHUB
+    MODE: 'GITHUB', 
     GITHUB_TOKEN: localStorage.getItem('GH_TOKEN') || '',
     GITHUB_OWNER: 'sagaevans',           // HARDCODE USERNAME GITHUB
     GITHUB_REPO: 'Ordner-Label-NasHKB',  // HARDCODE NAMA REPO
@@ -22,39 +22,37 @@ function saveConfig(config) {
 async function loadData() {
     const url = `https://api.github.com/repos/${StorageConfig.GITHUB_OWNER}/${StorageConfig.GITHUB_REPO}/contents/${StorageConfig.GITHUB_FILE_PATH}`;
     
-    // Siapkan header (Token hanya dikirim jika ada/sedang login Admin)
     const headers = { 'Accept': 'application/vnd.github.v3+json' };
     if (StorageConfig.GITHUB_TOKEN) {
         headers['Authorization'] = `token ${StorageConfig.GITHUB_TOKEN}`;
     }
 
     try {
-        // Tambahkan ?t=waktu agar browser pengunjung tidak menyimpan cache (selalu update terbaru)
-        const response = await fetch(url + '?t=' + new Date().getTime(), { headers: headers });
+        // Anti-cache agar selalu mendapat data terbaru
+        const response = await fetch(url + '?t=' + new Date().getTime(), { 
+            headers: headers,
+            cache: 'no-store'
+        });
         
         if (response.ok) {
             const data = await response.json();
             const content = decodeURIComponent(escape(atob(data.content)));
-            // Backup ke lokal jika sewaktu-waktu offline
             localStorage.setItem('ordnerData_Backup', content);
             return JSON.parse(content);
         } else if (response.status === 404) {
-            return []; // File data.json belum ada di repo, kembalikan array kosong
+            return []; 
         }
     } catch (e) {
         console.error("Gagal menarik data dari GitHub:", e);
     }
     
-    // Jika offline/gagal, ambil dari cache lokal browser
     return JSON.parse(localStorage.getItem('ordnerData_Backup')) || [];
 }
 
 // FUNGSI SAVE DATA (HANYA BISA JIKA ADA TOKEN DARI ADMIN)
 async function saveData(data) {
-    // Simpan ke lokal juga
     localStorage.setItem('ordnerData_Backup', JSON.stringify(data));
 
-    // Cegah save jika tidak punya token (Bukan admin)
     if (!StorageConfig.GITHUB_TOKEN) {
         alert("Gagal menyimpan ke Cloud: Anda tidak memiliki Token Akses.");
         return;
@@ -63,13 +61,14 @@ async function saveData(data) {
     const url = `https://api.github.com/repos/${StorageConfig.GITHUB_OWNER}/${StorageConfig.GITHUB_REPO}/contents/${StorageConfig.GITHUB_FILE_PATH}`;
     
     try {
-        // 1. Ambil token "SHA" (ID file terakhir di GitHub)
+        // 1. Ambil token "SHA" terbaru DENGAN ANTI-CACHE
         let sha = '';
-        const getRes = await fetch(url, {
+        const getRes = await fetch(url + '?t=' + new Date().getTime(), {
             headers: {
                 'Authorization': `token ${StorageConfig.GITHUB_TOKEN}`,
                 'Accept': 'application/vnd.github.v3+json'
-            }
+            },
+            cache: 'no-store' // <--- Ini kunci agar tidak gagal di save kedua
         });
         
         if (getRes.ok) {
@@ -77,7 +76,7 @@ async function saveData(data) {
             sha = getJson.sha; 
         }
 
-        // 2. Encode JSON ke format Base64 (Wajib dari Github)
+        // 2. Encode JSON ke format Base64
         const contentStr = JSON.stringify(data, null, 2);
         const encodedContent = btoa(unescape(encodeURIComponent(contentStr)));
 
@@ -85,7 +84,7 @@ async function saveData(data) {
             message: 'Auto-update data ordner via Admin Panel',
             content: encodedContent
         };
-        if (sha) bodyPayload.sha = sha; // Masukkan SHA agar Github mau menimpa file lama
+        if (sha) bodyPayload.sha = sha; 
 
         // 3. Timpa file di Github
         const putRes = await fetch(url, {
@@ -101,7 +100,10 @@ async function saveData(data) {
         if (putRes.ok) {
             console.log("Berhasil tersimpan otomatis ke GitHub!");
         } else {
-            alert("Peringatan: Gagal menyimpan ke Cloud. Token mungkin salah atau expired.");
+            // Tampilkan pesan error yang lebih spesifik jika tetap gagal
+            const errData = await putRes.json();
+            console.error("Github Error:", errData);
+            alert(`Gagal menyimpan ke Cloud: ${errData.message}`);
         }
     } catch (e) {
         console.error(e);
