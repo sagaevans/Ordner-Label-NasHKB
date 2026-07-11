@@ -66,5 +66,22 @@
     "updatedAt": 1783770522660,
     "createdAt": 1783770522660,
     "dokumen": []
+  },
+  {
+    "id": "ORD-1783770552084",
+    "kode": "BBK 05",
+    "noUrut": 5,
+    "jenis": "BUKTI BANK KELUAR",
+    "singkatan": "BBK",
+    "warnaJenis": "#ff8c00",
+    "tahun": 2026,
+    "nomorAwal": "15-081",
+    "nomorAkhir": "15-100",
+    "jumlah": 20,
+    "status": "Aktif",
+    "keterangan": "",
+    "updatedAt": 1783770552084,
+    "createdAt": 1783770552084,
+    "dokumen": []
   }
 ]
