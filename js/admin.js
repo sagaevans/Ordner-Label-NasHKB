@@ -29,17 +29,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     const formJumlah = document.getElementById('formJumlah');
     const formStatus = document.getElementById('formStatus');
     const formKeterangan = document.getElementById('formKeterangan');
-    const formWarnaJenis = document.getElementById('warnaJenis'); // NEW: Warna Label
+    const formWarnaJenis = document.getElementById('warnaJenis'); 
 
-    // --- Referensi Elemen DOM: Modal Settings ---
+    // --- Referensi Elemen DOM: Modal Settings (Lama) ---
     const modalSettings = document.getElementById('modalSettings');
     const closeSettingsBtn = document.getElementById('closeSettingsBtn');
     const saveSettingsBtn = document.getElementById('saveSettingsBtn');
-    const configMode = document.getElementById('configMode');
-    const githubSettings = document.getElementById('githubSettings');
-    const configToken = document.getElementById('configToken');
-    const configOwner = document.getElementById('configOwner');
-    const configRepo = document.getElementById('configRepo');
     
     // --- Referensi Elemen DOM: Tools ---
     const btnExport = document.getElementById('btnExport');
@@ -49,18 +44,35 @@ document.addEventListener('DOMContentLoaded', async () => {
     let ordnerData = [];
 
     /* =========================================================
-       INISIALISASI & RENDER TABEL
+       INISIALISASI & KOTAK DIALOG LOGIN (PROMPT)
     ========================================================= */
     
     async function init() {
-        loadSettingsToUI();
-        
-        // PAKSA USER MENGISI TOKEN JIKA MASIH KOSONG
-        if (StorageConfig.MODE === 'GITHUB' && !StorageConfig.GITHUB_TOKEN) {
-            alert("Halo! Untuk mengaktifkan fitur Auto-Save Cloud, silakan masukkan Pengaturan GitHub Anda (Username, Repo, dan Token) terlebih dahulu.");
-            openModal(modalSettings);
+        // Jika Token belum tersimpan di browser perangkat ini
+        if (!StorageConfig.GITHUB_TOKEN) {
+            const tokenInput = prompt(
+                "MASUK ADMIN PANEL\n\n" +
+                "Repository: sagaevans/Ordner-Label-NasHKB\n\n" +
+                "Silakan masukkan GitHub Personal Access Token Anda:"
+            );
+
+            // Jika admin mengisi token dan klik OK
+            if (tokenInput && tokenInput.trim() !== "") {
+                const newConfig = {
+                    GITHUB_TOKEN: tokenInput.trim()
+                };
+                saveConfig(newConfig); 
+                
+                // Mulai muat data
+                ordnerData = await loadData();
+                renderTable(ordnerData);
+            } else {
+                // Jika kosong/cancel
+                alert("Akses Ditolak: Token wajib diisi untuk mengelola data.");
+                tableBody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:red; font-weight:bold;">Akses ditolak. Silakan refresh halaman dan masukkan token API Anda.</td></tr>';
+            }
         } else {
-            // Hanya muat data tabel jika token tidak dipaksa diminta
+            // Jika Token sudah ada, langsung muat tabel
             ordnerData = await loadData();
             renderTable(ordnerData);
         }
@@ -74,7 +86,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        // Urutkan data berdasarkan tahun terbaru, lalu nomor urut, lalu abjad kode
         const sortedData = [...data].sort((a, b) => b.tahun - a.tahun || a.noUrut - b.noUrut || a.kode.localeCompare(b.kode));
 
         sortedData.forEach(item => {
@@ -114,25 +125,27 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     /* =========================================================
-       LOGIKA CRUD ORDNER
+       LOGIKA CRUD ORDNER (OTOMATIS SIMPAN KE CLOUD)
     ========================================================= */
 
-    // 1. TAMBAH (Buka form kosong)
     btnTambah.addEventListener('click', () => {
         ordnerForm.reset();
         formId.value = '';
-        if (formWarnaJenis) formWarnaJenis.value = '#FF8C00'; // Reset warna ke default (Oranye)
+        if (formWarnaJenis) formWarnaJenis.value = '#FF8C00'; 
         modalTitle.textContent = 'Tambah Ordner Baru';
         openModal(modalForm);
     });
 
-    // 2. SIMPAN (Proses tambah / edit)
     saveFormBtn.addEventListener('click', async () => {
-        // Validasi HTML bawaan (required)
         if (!ordnerForm.checkValidity()) {
             ordnerForm.reportValidity();
             return;
         }
+
+        // Tampilkan teks feedback
+        const originalText = saveFormBtn.textContent;
+        saveFormBtn.textContent = "Menyimpan ke GitHub...";
+        saveFormBtn.disabled = true;
 
         const currentTimestamp = Date.now();
         const idValue = formId.value;
@@ -144,7 +157,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             noUrut: parseInt(formNoUrut.value) || '', 
             jenis: formJenis.value.trim(),
             singkatan: formSingkatan.value.trim(),
-            warnaJenis: formWarnaJenis ? formWarnaJenis.value : '#FF8C00', // NEW: Simpan Warna
+            warnaJenis: formWarnaJenis ? formWarnaJenis.value : '#FF8C00', 
             tahun: parseInt(formTahun.value) || new Date().getFullYear(),
             nomorAwal: formNoAwal.value.trim(),
             nomorAkhir: formNoAkhir.value.trim(),
@@ -164,14 +177,17 @@ document.addEventListener('DOMContentLoaded', async () => {
             ordnerData.push(newData);
         }
 
-        // Simpan ke storage dan perbarui tabel
+        // Simpan otomatis menimpa ke GitHub API (karena storage.js sdh diedit)
         await saveData(ordnerData);
         ordnerData = await loadData(); 
         renderTable(ordnerData);
+        
+        // Kembalikan tombol
+        saveFormBtn.textContent = originalText;
+        saveFormBtn.disabled = false;
         closeModal(modalForm);
     });
 
-    // 3. EDIT & HAPUS (Event Delegation dari Tabel)
     function attachActionListeners() {
         const editBtns = document.querySelectorAll('.btn-edit');
         const deleteBtns = document.querySelectorAll('.btn-delete');
@@ -187,7 +203,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     formTahun.value = item.tahun || '';
                     formJenis.value = item.jenis || '';
                     formSingkatan.value = item.singkatan || '';
-                    if (formWarnaJenis) formWarnaJenis.value = item.warnaJenis || '#FF8C00'; // NEW: Tampilkan Warna
+                    if (formWarnaJenis) formWarnaJenis.value = item.warnaJenis || '#FF8C00'; 
                     formNoAwal.value = item.nomorAwal || '';
                     formNoAkhir.value = item.nomorAkhir || '';
                     formJumlah.value = item.jumlah || '';
@@ -204,22 +220,24 @@ document.addEventListener('DOMContentLoaded', async () => {
             btn.addEventListener('click', async (e) => {
                 const id = e.target.getAttribute('data-id');
                 if (confirm('Apakah Anda yakin ingin menghapus ordner ini secara permanen?')) {
-                    await deleteData(id);
-                    ordnerData = await loadData();
-                    renderTable(ordnerData);
+                    const itemIndex = ordnerData.findIndex(item => item.id === id);
+                    if (itemIndex > -1) {
+                        ordnerData.splice(itemIndex, 1);
+                        await saveData(ordnerData); // Save perubahan hapus ke github
+                        ordnerData = await loadData();
+                        renderTable(ordnerData);
+                    }
                 }
             });
         });
     }
 
-    // Tutup Modal Form
     closeFormBtn.addEventListener('click', () => closeModal(modalForm));
     cancelFormBtn.addEventListener('click', (e) => {
         e.preventDefault();
         closeModal(modalForm);
     });
 
-    // Fitur Pencarian di Tabel Admin
     searchAdmin.addEventListener('input', (e) => {
         const keyword = e.target.value.toLowerCase().trim();
         const filteredData = ordnerData.filter(item => {
@@ -231,118 +249,92 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderTable(filteredData);
     });
 
-
     /* =========================================================
-       LOGIKA PENGATURAN & BACKUP
+       PENGATURAN EXPORT / IMPORT LOKAL 
     ========================================================= */
 
-    function loadSettingsToUI() {
-        configMode.value = StorageConfig.MODE;
-        configToken.value = StorageConfig.GITHUB_TOKEN;
-        configOwner.value = StorageConfig.GITHUB_OWNER;
-        configRepo.value = StorageConfig.GITHUB_REPO;
-        toggleGithubSettings();
+    if (btnSettings) {
+        btnSettings.addEventListener('click', () => {
+            // Sembunyikan field repo (karena sudah di-hardcode)
+            const configArea = document.getElementById('githubSettings');
+            const modeSelect = document.getElementById('configMode');
+            if(configArea) configArea.style.display = 'none';
+            if(modeSelect && modeSelect.parentElement) modeSelect.parentElement.style.display = 'none';
+            openModal(modalSettings);
+        });
     }
 
-    function toggleGithubSettings() {
-        if (configMode.value === 'GITHUB') {
-            githubSettings.style.display = 'block';
-        } else {
-            githubSettings.style.display = 'none';
-        }
+    if (closeSettingsBtn) closeSettingsBtn.addEventListener('click', () => closeModal(modalSettings));
+    if (saveSettingsBtn) saveSettingsBtn.addEventListener('click', () => closeModal(modalSettings));
+
+    if (btnExport) {
+        btnExport.addEventListener('click', () => {
+            const jsonString = JSON.stringify(ordnerData, null, 2);
+            const blob = new Blob([jsonString], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `backup_ordner_${new Date().getTime()}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
     }
 
-    configMode.addEventListener('change', toggleGithubSettings);
+    if (importFile) {
+        importFile.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
 
-    btnSettings.addEventListener('click', () => {
-        loadSettingsToUI();
-        openModal(modalSettings);
-    });
-
-    closeSettingsBtn.addEventListener('click', () => closeModal(modalSettings));
-
-    saveSettingsBtn.addEventListener('click', async () => {
-        const newConfig = {
-            MODE: configMode.value,
-            GITHUB_TOKEN: configToken.value.trim(),
-            GITHUB_OWNER: configOwner.value.trim(),
-            GITHUB_REPO: configRepo.value.trim()
-        };
-        
-        saveConfig(newConfig); 
-        closeModal(modalSettings);
-        
-        ordnerData = await loadData();
-        renderTable(ordnerData);
-    });
-
-    /* =========================================================
-       EKSPOR, IMPOR, DAN RESET (JSON)
-    ========================================================= */
-    
-    btnExport.addEventListener('click', () => {
-        const jsonString = JSON.stringify(ordnerData, null, 2);
-        const blob = new Blob([jsonString], { type: "application/json" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `backup_ordner_${formatDate(Date.now()).replace(/\s/g, '_')}.json`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-    });
-
-    importFile.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = async function(event) {
-            try {
-                const importedData = JSON.parse(event.target.result);
-                if (!Array.isArray(importedData)) throw new Error("Format JSON tidak valid (harus array).");
-                
-                if(confirm("Peringatan: Data saat ini akan DITIMPA sepenuhnya oleh data dari file ini. Lanjutkan?")) {
-                    await saveData(importedData);
-                    ordnerData = await loadData();
-                    renderTable(ordnerData);
-                    closeModal(modalSettings);
+            const reader = new FileReader();
+            reader.onload = async function(event) {
+                try {
+                    const importedData = JSON.parse(event.target.result);
+                    if (!Array.isArray(importedData)) throw new Error("Format JSON tidak valid.");
+                    
+                    if(confirm("Peringatan: Data di GitHub akan DITIMPA dengan file ini. Lanjutkan?")) {
+                        await saveData(importedData);
+                        ordnerData = await loadData();
+                        renderTable(ordnerData);
+                        closeModal(modalSettings);
+                    }
+                } catch (error) {
+                    alert("Gagal mengimpor file.");
                 }
-            } catch (error) {
-                console.error("Import Error:", error);
-                alert("Gagal mengimpor file. Pastikan itu adalah file JSON yang valid.");
-            }
-        };
-        reader.readAsText(file);
-        e.target.value = ''; 
-    });
+            };
+            reader.readAsText(file);
+            e.target.value = ''; 
+        });
+    }
 
-    btnReset.addEventListener('click', async () => {
-        if(confirm("PERINGATAN KERAS: Seluruh data Anda akan dihapus dan diganti dengan 1 data contoh. Lanjutkan?")) {
-            const dummyData = [{
-                "id": generateId('ORD'),
-                "kode": "BBK-2013",
-                "noUrut": 1, 
-                "jenis": "BUKTI BANK KELUAR",
-                "singkatan": "BBK",
-                "warnaJenis": "#FF8C00", // Default warna oranye
-                "tahun": 2013,
-                "nomorAwal": "15...0000",
-                "nomorAkhir": "15...0036",
-                "jumlah": 37,
-                "status": "Aktif",
-                "keterangan": "Ini adalah data dummy hasil reset.",
-                "createdAt": Date.now(),
-                "updatedAt": Date.now(),
-                "dokumen": []
-            }];
-            await saveData(dummyData);
-            ordnerData = await loadData();
-            renderTable(ordnerData);
-            closeModal(modalSettings);
-        }
-    });
+    if (btnReset) {
+        btnReset.addEventListener('click', async () => {
+            if(confirm("PERINGATAN KERAS: Seluruh data Anda akan dihapus dan diganti dengan 1 data contoh. Lanjutkan?")) {
+                const dummyData = [{
+                    "id": generateId('ORD'),
+                    "kode": "BBK-2013",
+                    "noUrut": 1, 
+                    "jenis": "BUKTI BANK KELUAR",
+                    "singkatan": "BBK",
+                    "warnaJenis": "#FF8C00", 
+                    "tahun": 2013,
+                    "nomorAwal": "15...0000",
+                    "nomorAkhir": "15...0036",
+                    "jumlah": 37,
+                    "status": "Aktif",
+                    "keterangan": "Ini adalah data dummy.",
+                    "createdAt": Date.now(),
+                    "updatedAt": Date.now(),
+                    "dokumen": []
+                }];
+                await saveData(dummyData);
+                ordnerData = await loadData();
+                renderTable(ordnerData);
+                closeModal(modalSettings);
+            }
+        });
+    }
 
     // Jalankan aplikasi Admin
     init();
