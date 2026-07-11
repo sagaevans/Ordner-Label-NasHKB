@@ -4,13 +4,11 @@
 ========================================================= */
 
 document.addEventListener('DOMContentLoaded', async () => {
-    // --- Referensi Elemen DOM: Tabel & Toolbar ---
     const tableBody = document.getElementById('tableBody');
     const searchAdmin = document.getElementById('searchAdmin');
     const btnTambah = document.getElementById('btnTambah');
     const btnSettings = document.getElementById('btnSettings');
 
-    // --- Referensi Elemen DOM: Modal Form ---
     const modalForm = document.getElementById('modalForm');
     const closeFormBtn = document.getElementById('closeFormBtn');
     const cancelFormBtn = document.getElementById('cancelFormBtn');
@@ -18,7 +16,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const modalTitle = document.getElementById('modalTitle');
     const ordnerForm = document.getElementById('ordnerForm');
     
-    // --- Referensi Elemen DOM: Form Inputs ---
     const formId = document.getElementById('formId');
     const formKode = document.getElementById('formKode');
     const formNoUrut = document.getElementById('formNoUrut'); 
@@ -32,7 +29,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const formKeterangan = document.getElementById('formKeterangan');
     const formWarnaJenis = document.getElementById('warnaJenis'); 
 
-    // --- Referensi Elemen DOM: Modal Settings (Bawaan Anda) ---
     const modalSettings = document.getElementById('modalSettings');
     const closeSettingsBtn = document.getElementById('closeSettingsBtn');
     const saveSettingsBtn = document.getElementById('saveSettingsBtn');
@@ -42,66 +38,73 @@ document.addEventListener('DOMContentLoaded', async () => {
     const configOwner = document.getElementById('configOwner');
     const configRepo = document.getElementById('configRepo');
     
-    // --- Referensi Elemen DOM: Tools ---
     const btnExport = document.getElementById('btnExport');
     const importFile = document.getElementById('importFile');
     const btnReset = document.getElementById('btnReset');
 
     let ordnerData = [];
 
-    /* =========================================================
-       INISIALISASI & MODAL PENGATURAN OTOMATIS
-    ========================================================= */
-    
     async function init() {
-        // 1. Kunci dan isi otomatis (Hardcode) elemen input di UI Pengaturan
         if (configMode) {
             configMode.value = 'GITHUB';
-            configMode.disabled = true; // Kunci Dropdown
+            configMode.disabled = true; 
             configMode.style.backgroundColor = '#f1f5f9';
             configMode.style.cursor = 'not-allowed';
         }
         if (configOwner) {
             configOwner.value = 'sagaevans';
-            configOwner.readOnly = true; // Kunci Input
+            configOwner.readOnly = true; 
             configOwner.style.backgroundColor = '#f1f5f9';
             configOwner.style.color = '#64748b';
             configOwner.style.cursor = 'not-allowed';
         }
         if (configRepo) {
             configRepo.value = 'Ordner-Label-NasHKB';
-            configRepo.readOnly = true; // Kunci Input
+            configRepo.readOnly = true; 
             configRepo.style.backgroundColor = '#f1f5f9';
             configRepo.style.color = '#64748b';
             configRepo.style.cursor = 'not-allowed';
         }
         
-        // Tampilkan token lama jika sudah ada
         if (configToken && StorageConfig.GITHUB_TOKEN) {
             configToken.value = StorageConfig.GITHUB_TOKEN;
         }
 
-        // 2. Jika Token belum tersimpan, langsung paksa buka Modal Pengaturan
         if (!StorageConfig.GITHUB_TOKEN) {
             openModal(modalSettings);
         } else {
-            // Jika token sudah ada, langsung muat data
             ordnerData = await loadData();
             renderTable(ordnerData);
         }
     }
 
-    // --- LOGIKA TOMBOL "TERAPKAN PENGATURAN" ---
+    // --- LOGIKA TOMBOL "TERAPKAN PENGATURAN" DENGAN VALIDASI ---
     if (saveSettingsBtn) {
         saveSettingsBtn.addEventListener('click', async () => {
             const tokenVal = configToken ? configToken.value.trim() : '';
             
             if (!tokenVal) {
                 alert("Token API GitHub wajib diisi untuk mengelola data!");
-                return; // Jangan tutup modal jika kosong
+                return; 
             }
 
-            // Simpan HANYA Token ke storage
+            // Animasi loading saat verifikasi
+            const originalText = saveSettingsBtn.textContent;
+            saveSettingsBtn.textContent = "Memeriksa Token...";
+            saveSettingsBtn.disabled = true;
+
+            // Proses cek ke Github
+            const isValid = await verifyGitHubToken(tokenVal);
+
+            // Kembalikan tombol ke keadaan semula
+            saveSettingsBtn.textContent = originalText;
+            saveSettingsBtn.disabled = false;
+
+            if (!isValid) {
+                alert("Gagal Masuk: Token API tidak valid atau sudah kedaluwarsa (Bad credentials).");
+                return; // Jangan tutup modal jika salah
+            }
+
             const newConfig = {
                 GITHUB_TOKEN: tokenVal
             };
@@ -109,26 +112,20 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             closeModal(modalSettings);
             
-            // Muat ulang data setelah token tersimpan
             ordnerData = await loadData();
             renderTable(ordnerData);
         });
     }
 
-    // Pencegahan agar admin tidak asal tutup form jika token kosong
     if (closeSettingsBtn) {
         closeSettingsBtn.addEventListener('click', () => {
             if (!StorageConfig.GITHUB_TOKEN) {
-                alert("Anda tidak bisa menutup panel ini sebelum memasukkan Token API.");
+                alert("Anda tidak bisa menutup panel ini sebelum memasukkan Token API yang valid.");
             } else {
                 closeModal(modalSettings);
             }
         });
     }
-
-    /* =========================================================
-       RENDER TABEL
-    ========================================================= */
 
     function renderTable(data) {
         tableBody.innerHTML = '';
@@ -163,10 +160,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         attachActionListeners();
     }
-
-    /* =========================================================
-       FUNGSI MODAL (Buka & Tutup)
-    ========================================================= */
     
     function openModal(modalEl) {
         if(modalEl) modalEl.classList.add('active');
@@ -175,10 +168,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     function closeModal(modalEl) {
         if(modalEl) modalEl.classList.remove('active');
     }
-
-    /* =========================================================
-       LOGIKA CRUD ORDNER (OTOMATIS SIMPAN KE CLOUD)
-    ========================================================= */
 
     btnTambah.addEventListener('click', () => {
         ordnerForm.reset();
@@ -298,10 +287,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderTable(filteredData);
     });
 
-    /* =========================================================
-       PENGATURAN EXPORT / IMPORT LOKAL 
-    ========================================================= */
-
     if (btnSettings) {
         btnSettings.addEventListener('click', () => {
             openModal(modalSettings);
@@ -377,6 +362,5 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // Jalankan aplikasi Admin
     init();
 });
