@@ -53,9 +53,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     ========================================================= */
     
     async function init() {
-        ordnerData = await loadData();
-        renderTable(ordnerData);
         loadSettingsToUI();
+        
+        // PAKSA USER MENGISI TOKEN JIKA MASIH KOSONG
+        if (StorageConfig.MODE === 'GITHUB' && !StorageConfig.GITHUB_TOKEN) {
+            alert("Halo! Untuk mengaktifkan fitur Auto-Save Cloud, silakan masukkan Pengaturan GitHub Anda (Username, Repo, dan Token) terlebih dahulu.");
+            openModal(modalSettings);
+        } else {
+            // Hanya muat data tabel jika token tidak dipaksa diminta
+            ordnerData = await loadData();
+            renderTable(ordnerData);
+        }
     }
 
     function renderTable(data) {
