@@ -1,0 +1,19 @@
+[
+  {
+    "id": "ORD-1783744081326",
+    "kode": "BBK 01",
+    "noUrut": 1,
+    "jenis": "BUKTI BANK KELUAR",
+    "singkatan": "BBK",
+    "warnaJenis": "#ff8c00",
+    "tahun": 2026,
+    "nomorAwal": "15-000",
+    "nomorAkhir": "15-023",
+    "jumlah": 24,
+    "status": "Aktif",
+    "keterangan": "",
+    "updatedAt": 1783744081326,
+    "createdAt": 1783744081326,
+    "dokumen": []
+  }
+]
