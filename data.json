@@ -100,22 +100,5 @@
     "updatedAt": 1783915724463,
     "createdAt": 1783915724463,
     "dokumen": []
-  },
-  {
-    "id": "ORD-1783915735039",
-    "kode": "MEMO",
-    "noUrut": 1,
-    "jenis": "JURNAL MEMORIAL",
-    "singkatan": "ZM",
-    "warnaJenis": "#1605ff",
-    "tahun": 2026,
-    "nomorAwal": ".",
-    "nomorAkhir": ".",
-    "jumlah": 0,
-    "status": "Aktif",
-    "keterangan": "",
-    "updatedAt": 1783915735039,
-    "createdAt": 1783915735039,
-    "dokumen": []
   }
 ]
