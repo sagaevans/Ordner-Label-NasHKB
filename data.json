@@ -117,5 +117,22 @@
     "updatedAt": 1784512536148,
     "createdAt": 1784512536148,
     "dokumen": []
+  },
+  {
+    "id": "ORD-1784512615835",
+    "kode": "BA 2026",
+    "noUrut": 6,
+    "jenis": "BERITA ACARA",
+    "singkatan": "BA",
+    "warnaJenis": "#e1ff00",
+    "tahun": 2026,
+    "nomorAwal": "JUNI",
+    "nomorAkhir": "JULI",
+    "jumlah": 0,
+    "status": "Aktif",
+    "keterangan": "",
+    "updatedAt": 1784512615835,
+    "createdAt": 1784512615835,
+    "dokumen": []
   }
 ]
