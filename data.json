@@ -100,5 +100,22 @@
     "updatedAt": 1783915724463,
     "createdAt": 1783915724463,
     "dokumen": []
+  },
+  {
+    "id": "ORD-1784512536148",
+    "kode": "KPI 2025",
+    "noUrut": 1,
+    "jenis": "FORM PENILAIAN KINERJA",
+    "singkatan": "KPI",
+    "warnaJenis": "#00ff4c",
+    "tahun": 2025,
+    "nomorAwal": "2025",
+    "nomorAkhir": "2026",
+    "jumlah": 0,
+    "status": "Aktif",
+    "keterangan": "",
+    "updatedAt": 1784512536148,
+    "createdAt": 1784512536148,
+    "dokumen": []
   }
 ]
